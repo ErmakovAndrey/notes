@@ -73,7 +73,7 @@ export default {
           {   
               id: 1,
               title: 'First Note',
-              descr: 'Decription First note',
+              descr: 'Description First note',
               date: new Date().toLocaleString(),
               priority: 0,
               onEdit: false,
@@ -81,7 +81,7 @@ export default {
           {
               id: 2,
               title: 'Second Note',
-              descr: 'Decription Second note',
+              descr: 'Description Second note',
               date: new Date().toLocaleString(),
               priority: 0,
               onEdit: false,
@@ -89,7 +89,7 @@ export default {
           {
               id: 3,
               title: 'Third Note',
-              descr: 'Decription Third note',
+              descr: 'Description Third note',
               date: new Date().toLocaleString(),
               priority: 1,
               onEdit: false,
@@ -97,7 +97,7 @@ export default {
           {
               id: 34,
               title: 'Fourth Note',
-              descr: 'Decription Fourth note',
+              descr: 'Description Fourth note',
               date: new Date().toLocaleString(),
               priority: 2,
               onEdit: false,
