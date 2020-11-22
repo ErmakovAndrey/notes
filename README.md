@@ -1,6 +1,12 @@
-# vue-cli
+# Notes
 
-## Project setup
+```
+Simple app to create and manage notes
+```
+
+## vue-cli
+
+### Project setup
 ```
 npm install
 ```
