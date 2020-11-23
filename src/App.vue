@@ -148,6 +148,7 @@ export default {
       editTitle(id, titleVelue) {
           let note = this.notes.find(item => item.id == id);
           note.title = titleVelue;
+          note.date = new Date().toLocaleString();
       } 
   }
 }
