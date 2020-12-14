@@ -1,58 +1,108 @@
 <template>
-    <div class="notes">
-        <div 
-            v-for="(note) in notes" 
-            :key="note.id" 
-            :class="{full: !grid, extra: note.priority ==2, high: note.priority ==1}" 
-            class="note"
-            @click="note.onEdit = false"
-        >
-            <div class="note-header" :class="{full: !grid}">
-                <p @dblclick="note.onEdit = true; editValue = note.title" :class="{'hide-title': note.onEdit}">{{ note.title }}</p>
-                <div class="note-input" :class="{'note-input_show-input': note.onEdit}">
-                    <input 
-                        type="text"  
-                        @keyup.enter="editTitle(note.id)" 
-                        @blur="note.onEdit = false"
-                        v-model="editValue" 
-                        @click.stop=""
-                    />
-                </div>
-                <p class="close" @click="removeNote(note.id)">x</p>
-            </div>
-            <div class="note-body">
-                <p>{{ note.descr }}</p>
-                <span>{{ note.date }}</span>
-            </div>
-        </div>
+
+  <div class="new-note__wrapper">
+
+    <div class="note-header">
+
+      <!-- search -->
+      <Search
+          :value="search"
+          placeholder="Find note"
+          @search="search = $event"
+      />
+
+      <!-- icons control -->
+      <div class="icons">
+        <svg :class="{active: grid}" @click="grid=true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <svg :class="{active: !grid}" @click="grid=false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg>
+      </div>
+
     </div>
+
+    <!-- notes -->
+
+    <div class="notes">
+      <div
+          v-for="note in notesFilter"
+          :key="note.id"
+          @click="close(note.id)"
+          :class="[{full: !grid}, note.priority]"
+          class="note"
+      >
+        <div class="note-header" :class="{full: !grid}">
+          <p @dblclick="note.onEdit = true; editValue = note.title" :class="{'hide-title': note.onEdit}">{{ note.title }}</p>
+          <div class="note-input" :class="{'note-input_show-input': note.onEdit}">
+            <input
+                type="text"
+                @keyup.enter="editTitle(note.id)"
+                @blur="close(note.id)"
+                v-model="editValue"
+                @click.stop=""
+            />
+          </div>
+          <p class="close" @click="removeNote(note.id)">x</p>
+        </div>
+        <div class="note-body">
+          <p>{{ note.descr }}</p>
+          <span>{{ note.date }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </template>
 
 <script>
+import Search from '@/components/Search.vue';
 export default {
-    props: {
-        notes: {
-            type: Array,
-            required: true
-        },
-        grid: {
-            type: Boolean,
-            required: true
-        }
-    },
-    data() {
-        return { editValue: ''}
-    },
-    methods: {
-        removeNote(id) {
-            this.$emit('removeNote', id)
-        },
-        editTitle(id) {
-            this.notes.find(item => item.id == id).onEdit = false;
-            this.$emit('editTitle', id, this.editValue);
-            this.editValue = '';
-        },
+  components: {Search},
+  data () {
+    return {
+      search: '',
+      grid: true,
+      note: {
+        title: '',
+        descr: '',
+      },
+      notes: [],
+      priorities: {},
+      editValue: ''
     }
+  },
+  created() {
+    this.notes = this.$store.getters.getNotes
+    this.priorities = this.$store.getters.getPriorities
+  },
+  computed: {
+    notesFilter() {
+      let array = this.notes,
+          search = this.search;
+      array = array.sort((a, b) => {
+        return this.priorities[a.priority].value - this.priorities[b.priority].value
+      });
+      if (!search) return array;
+      search = search.trim().toLowerCase();
+      array = array.filter(item => {
+        if (item.title.toLowerCase().indexOf(search) !== -1) return item
+      });
+      return array;
+    }
+  },
+  methods: {
+    removeNote(id) {
+      this.$store.dispatch('removeNote', id)
+    },
+    editTitle(id) {
+      let titleValue = this.editValue
+      this.$store.dispatch('editTitle', {id, titleValue})
+      this.close(id)
+    },
+    close(id) {
+      const note = this.notes.find((item) => item.id == id)
+      note.onEdit = false;
+    }
+  }
 }
 </script>
 
